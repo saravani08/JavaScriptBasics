@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Order Form</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #helpText {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pizza Order Form -->
+<form id="pizzaForm">
+   <label for="customerName">Name:</label>
+    <input type="text" id="customerName" required>
+    <br>
+
+    <label for="customerEmail">Email:</label>
+    <input type="email" id="customerEmail" required>
+    <br>
+
+ <b><label>Toppings:</label></b>
+ <br>
+    <label><input type="checkbox" name="topping" value="Pepperoni"> Pepperoni</label>
+    <label><input type="checkbox" name="topping" value="Mushrooms"> Mushrooms</label>
+    <label><input type="checkbox" name="topping" value="Onions"> Onions</label>
+    <br>
+
+    <b><label>How do you want your pizza!</label></b>
+    <label><input type="radio" name="delivery" value="Delivery"> Delivery</label>
+    <label><input type="radio" name="delivery" value="Pickup"> Pickup</label>
+    <br>
+
+    <label for="tipAmount">Tip?</label>
+    <select id="tipAmount">
+        <option value="0.15">15%</option>
+        <option value="0.20">20%</option>
+        <option value="0.25">25%</option>
+    </select>
+    <br>
+
+    <label for="customerAddress">Address:</label>
+    <br>
+    <textarea id="customerAddress" align="center" ></textarea>
+    <br>
+
+    
+    <button type="button" onclick="showHelp()">Show Help</button>
+    <button type="button" onclick="submitForm()">Submit</button>
+    <button type="button" onclick="clearFields()">Reset</button>
+    <button type="button" id="showSummaryBtn" onclick="showSummary()">Show Summary</button>
+    <br>
+
+   
+   
+    
+    <table id="summaryTable" style="display: none;">
+        <tr>
+            <th>Field</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Customer Name</td>
+            <td id="summaryCustomerName"></td>
+        </tr>
+        <tr>
+            <td>Customer Email</td>
+            <td id="summaryCustomerEmail"></td>
+        </tr>
+        <tr>
+            <td>Customer Address</td>
+            <td id="summaryCustomerAddress"></td>
+        </tr>
+        <tr>
+            <td>Toppings Selected</td>
+            <td id="summaryToppings"></td>
+        </tr>
+        <tr>
+            <td>Delivery Option</td>
+            <td id="summaryDelivery"></td>
+        </tr>
+        <tr>
+            <td>Total Price</td>
+            <td id="summaryTotalPrice"></td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    
+    function showHelp() {
+    const helpDiv = document.createElement('div');
+    helpDiv.style.position = 'fixed';
+    helpDiv.style.top = '10px';
+    helpDiv.style.right = '10px';
+    helpDiv.style.backgroundColor = '#f0f0f0';
+    helpDiv.style.padding = '10px';
+    helpDiv.style.border = '1px solid #ddd';
+    helpDiv.style.borderRadius = '5px';
+
+    const helpTextArea = document.createElement('textarea');
+    helpTextArea.rows = '3';
+    helpTextArea.style.width = '200px';
+    helpTextArea.readOnly = true;
+    helpTextArea.value = 'This Text Area provides content-sensitive help.';
+
+    helpDiv.appendChild(helpTextArea);
+    document.body.appendChild(helpDiv);
+
+    setTimeout(() => {
+        document.body.removeChild(helpDiv);
+    }, 3000);
+}
+
+    function submitForm() {
+        const form = document.getElementById('pizzaForm');
+        const showSummaryBtn = document.getElementById('showSummaryBtn');
+
+        if (form.checkValidity()) {
+            showSummaryBtn.disabled = false;
+        } else {
+            alert('Error: Please fill in all fields.');
+        }
+    }
+
+    
+    function clearFields() {
+        const form = document.getElementById('pizzaForm');
+        const showSummaryBtn = document.getElementById('showSummaryBtn');
+        form.reset();
+        showSummaryBtn.disabled = true;
+        hideSummaryTable();
+    }
+
+  
+    function showSummary() {
+        const summaryTable = document.getElementById('summaryTable');
+        const summaryCustomerName = document.getElementById('summaryCustomerName');
+        const summaryCustomerEmail = document.getElementById('summaryCustomerEmail');
+        const summaryCustomerAddress = document.getElementById('summaryCustomerAddress');
+        const summaryToppings = document.getElementById('summaryToppings');
+        const summaryDelivery = document.getElementById('summaryDelivery');
+        const summaryTotalPrice = document.getElementById('summaryTotalPrice');
+
+
+const customerName = document.getElementById('customerName').value;
+const customerEmail = document.getElementById('customerEmail').value;
+const customerAddress = document.getElementById('customerAddress').value;
+
+const toppings = Array.from(document.querySelectorAll('input[name="topping"]:checked'))
+    .map(topping => topping.value)
+    .join(', ');
+
+const delivery = document.querySelector('input[name="delivery"]:checked')?.value || 'Not Selected';
+const tipAmount = parseFloat(document.getElementById('tipAmount').value);
+
+
+const basePrice = 10;
+const numberOfToppings = toppings.split(', ').length;
+const deliveryFee = delivery === 'Delivery' ? 5 : 0;
+const totalPrice = (basePrice + 1.5 * numberOfToppings + deliveryFee) * (1 + tipAmount);
+
+
+summaryCustomerName.textContent = customerName;
+summaryCustomerEmail.textContent = customerEmail;
+summaryCustomerAddress.textContent = customerAddress;
+summaryToppings.textContent = toppings || 'None';
+summaryDelivery.textContent = delivery;
+summaryTotalPrice.textContent = `$${totalPrice.toFixed(2)}`;
+
+
+summaryTable.style.display = 'table';
+}
+
+
+function hideSummaryTable() {
+const summaryTable = document.getElementById('summaryTable');
+summaryTable.style.display = 'none';
+}
+</script>
+
+</body>
+</html>
+       
